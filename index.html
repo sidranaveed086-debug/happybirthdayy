@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday, Mister Busy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-top: #eef7ff;
+      --bg-mid: #e0f1ff;
+      --bg-bot: #d3e9fc;
+      --card-bg: rgba(255, 255, 255, 0.78);
+      --card-border: rgba(255, 255, 255, 0.92);
+      --ink: #142842;
+      --muted: #4b6584;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --shadow: 0 20px 50px rgba(24, 62, 108, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-bot) 100%);
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .ambient-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ribbon {
+      position: absolute;
+      width: 160%;
+      height: 130px;
+      left: -30%;
+      border-radius: 50%;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(147, 197, 253, 0.28), rgba(255, 255, 255, 0.45), rgba(147, 197, 253, 0.28), rgba(255, 255, 255, 0));
+      filter: blur(8px);
+      animation: driftRibbon 14s ease-in-out infinite alternate;
+    }
+
+    .ribbon.r1 { top: 12%; transform: rotate(-6deg); }
+    .ribbon.r2 { top: 46%; transform: rotate(5deg); animation-delay: -5s; }
+    .ribbon.r3 { top: 78%; transform: rotate(-4deg); animation-delay: -9s; }
+
+    @keyframes driftRibbon {
+      0% { transform: translateX(-4%) rotate(-5deg); }
+      100% { transform: translateX(4%) rotate(4deg); }
+    }
+
+    .floating-heart {
+      position: absolute;
+      bottom: -40px;
+      color: rgba(59, 130, 246, 0.24);
+      font-size: 20px;
+      animation: riseHeart linear infinite;
+      user-select: none;
+    }
+
+    @keyframes riseHeart {
+      0% { transform: translateY(0) scale(0.85) rotate(0deg); opacity: 0; }
+      15% { opacity: 0.85; }
+      85% { opacity: 0.7; }
+      100% { transform: translateY(-110vh) scale(1.15) rotate(18deg); opacity: 0; }
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .music-btn {
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(24, 62, 108, 0.1);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .music-btn:hover {
+      transform: translateY(-1px);
+      background: #ffffff;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      max-width: 680px;
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 32px 26px 28px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (min-width: 600px) {
+      .shell {
+        padding: 40px 42px 34px;
+      }
+    }
+
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 24px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.16);
+      transition: width 0.25s ease, background 0.25s ease;
+    }
+
+    .dot.active {
+      width: 34px;
+      background: var(--accent);
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .page {
+      display: none;
+      animation: fadeSlide 0.35s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    h1, h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 5vw, 2.85rem);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: clamp(1.75rem, 4vw, 2.3rem);
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .cake-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 22px 0 24px;
+    }
+
+    .cake {
+      position: relative;
+      width: 220px;
+      height: 170px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .candles {
+      display: flex;
+      gap: 22px;
+      margin-bottom: 4px;
+      z-index: 3;
+    }
+
+    .candle {
+      position: relative;
+      width: 10px;
+      height: 34px;
+      border-radius: 4px 4px 2px 2px;
+      background: repeating-linear-gradient(45deg, #ffffff, #ffffff 5px, #93c5fd 5px, #93c5fd 10px);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+    }
+
+    .flame {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 18px;
+      border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+      background: radial-gradient(circle at 50% 65%, #fffbeb 15%, #fbbf24 55%, #f97316 100%);
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.9);
+      animation: flicker 0.25s infinite alternate;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .cake.blown .flame {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.2);
+    }
+
+    @keyframes flicker {
+      from { transform: translateX(-50%) scale(0.95) rotate(-2deg); }
+      to { transform: translateX(-50%) scale(1.06) rotate(2deg); }
+    }
+
+    .tier-top {
+      width: 146px;
+      height: 46px;
+      background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+      border: 2px solid #bfdbfe;
+      border-radius: 14px 14px 8px 8px;
+      z-index: 2;
+    }
+
+    .tier-mid {
+      width: 182px;
+      height: 52px;
+      margin-top: -4px;
+      background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
+      border: 2px solid #93c5fd;
+      border-radius: 12px;
+      z-index: 1;
+    }
+
+    .plate {
+      width: 224px;
+      height: 14px;
+      margin-top: -2px;
+      background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%);
+      border-radius: 999px;
+      box-shadow: 0 8px 18px rgba(24, 62, 108, 0.14);
+    }
+
+    .blow-status {
+      margin-top: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--accent);
+      min-height: 20px;
+    }
+
+    .note-box {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(147, 197, 253, 0.45);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 16px 0 22px;
+    }
+
+    .note-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .ps-line {
+      font-style: italic;
+      color: var(--ink);
+      font-weight: 500;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(59, 130, 246, 0.3);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 11px;
+      margin: 18px 0 20px;
+    }
+
+    .option-btn {
+      text-align: left;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--ink);
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+      border-color: var(--accent);
+      background: #ffffff;
+      transform: translateX(3px);
+    }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      font-weight: 600;
+    }
+
+    .feedback {
+      min-height: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .nav-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--ink);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: #ffffff;
+    }
+
+    .final-prayer {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.5rem, 3.6vw, 2rem);
+      font-style: italic;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.38;
+      background: rgba(255, 255, 255, 0.82);
+      border-left: 4px solid var(--accent);
+      padding: 20px 22px;
+      border-radius: 0 18px 18px 0;
+      margin: 18px 0 22px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-layer" id="ambientLayer" aria-hidden="true">
+    <div class="ribbon r1"></div>
+    <div class="ribbon r2"></div>
+    <div class="ribbon r3"></div>
+  </div>
+
+  <div class="top-bar">
+    <button class="music-btn" id="musicToggle" type="button" onclick="toggleMusic()">♪ Music: Off</button>
+  </div>
+
+  <main class="shell">
+    <div class="progress-wrap">
+      <div class="dots" id="dots"></div>
+      <div class="step-label" id="stepLabel">Page 1 of 7</div>
+    </div>
+
+    <!-- Page 1: Welcome & Cake -->
+    <section class="page active" data-page="1">
+      <span class="eyebrow">A Little Birthday Corner</span>
+      <h1>Happy Birthday, Mister Busy</h1>
+      <p>Even on your busiest days, today belongs to a quieter smile, a calmer mind, and a wish made just for you.</p>
+
+      <div class="cake-stage">
+        <div class="cake" id="cake">
+          <div class="candles">
+            <div class="candle"><span class="flame"></span></div>
+            <div class="candle"><span class="flame"></span></div>
+            <div class="candle"><span class="flame"></span></div>
+          </div>
+          <div class="tier-top"></div>
+          <div class="tier-mid"></div>
+          <div class="plate"></div>
+        </div>
+        <div class="blow-status" id="blowStatus">Tap the button below to blow out the candles and make a wish.</div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="blowCandles()">Blow Out Candles</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Open Your Note →</button>
+      </div>
+    </section>
+
+    <!-- Page 2: Birthday Wish -->
+    <section class="page" data-page="2">
+      <span class="eyebrow">Birthday Note</span>
+      <h2>To the One Always Carrying Too Much</h2>
+      <div class="note-box">
+        <p>Happy birthday to the man who works hard, cares deeply, and often forgets to pause for himself.</p>
+        <p>May this year bring you steadier days, lighter shoulders, genuine peace of mind, and every good thing you quietly strive for.</p>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="prevPage()">← Back</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Next →</button>
+      </div>
+    </section>
+
+    <!-- Page 3: Sofa Advice + Saving P.S. -->
+    <section class="page" data-page="3">
+      <span class="eyebrow">Gentle Reminder</span>
+      <h2>A Quiet Word Before You Rush Off</h2>
+      <div class="note-box">
+        <p>Sit down properly on the sofa, put the screen away for a few minutes, drink some water, and let yourself actually rest—not just lie down while still thinking about tasks.</p>
+        <p class="ps-line">P.S. Keep saving a little something for yourself too—your time, your sleep, your health, and your peace.</p>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="prevPage()">← Back</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Play 3 Quick Questions →</button>
+      </div>
+    </section>
+
+    <!-- Page 4: Quiz Question 1 -->
+    <section class="page" data-page="4">
+      <span class="eyebrow">Quick Check • 1 of 3</span>
+      <h2>What is your most used status today?</h2>
+      <div class="quiz-options">
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Classic Mister Busy — five things at once, still showing up.')">Busy with something important</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Officially off-duty for five minutes — no negotiating.')">Taking a rare break</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'A little sleepy, still sharp, and definitely deserving cake.')">Running on coffee and willpower</button>
+      </div>
+      <div class="feedback" id="fb-4"></div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="prevPage()">← Back</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Question 2 →</button>
+      </div>
+    </section>
+
+    <!-- Page 5: Quiz Question 2 -->
+    <section class="page" data-page="5">
+      <span class="eyebrow">Quick Check • 2 of 3</span>
+      <h2>What does your ideal birthday evening look like?</h2>
+      <div class="quiz-options">
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Peaceful, warm, and zero rushing — the best kind of evening.')">Calm, quiet, and stress-free</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Good food and real rest — simple things done right.')">Good food and proper rest</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'A slow evening where nothing urgent is chasing you.')">Uninterrupted time to unwind</button>
+      </div>
+      <div class="feedback" id="fb-5"></div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="prevPage()">← Back</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Question 3 →</button>
+      </div>
+    </section>
+
+    <!-- Page 6: Quiz Question 3 & Secret Compliment -->
+    <section class="page" data-page="6">
+      <span class="eyebrow">Quick Check • 3 of 3</span>
+      <h2>Pick one to unlock a secret compliment</h2>
+      <div class="quiz-options">
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Secret compliment: Your calm strength and integrity stand out even when you say very little.')">Unlock Compliment A</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Secret compliment: People feel steadier around you because you take your responsibilities seriously.')">Unlock Compliment B</button>
+        <button class="option-btn" type="button" onclick="answerQuiz(this, 'Secret compliment: Even on heavy days, your heart is far softer than you let on.')">Unlock Compliment C</button>
+      </div>
+      <div class="feedback" id="fb-6"></div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="prevPage()">← Back</button>
+        <button class="btn btn-primary" type="button" onclick="nextPage()">Final Page →</button>
+      </div>
+    </section>
+
+    <!-- Page 7: Final Closing Page -->
+    <section class="page" data-page="7">
+      <span class="eyebrow">One Last Thing</span>
+      <h2>Happy Birthday, Once More</h2>
+      <div class="final-prayer">
+        After your mama, I am the only one who prays for you before myself.
+      </div>
+      <p>May Allah protect you, guide you, ease every hardship, and bless your days ahead with barakah and happiness.</p>
+      <div class="nav-row">
+        <button class="btn btn-secondary" type="button" onclick="goToPage(1)">Replay From Start</button>
+        <button class="btn btn-primary" type="button" onclick="blowCandles()">Make Another Wish</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const totalPages = 7;
+    let currentPage = 1;
+    let audioCtx = null;
+    let musicInterval = null;
+    let isPlaying = false;
+
+    const dotsContainer = document.getElementById('dots');
+    const stepLabel = document.getElementById('stepLabel');
+
+    for (let i = 1; i <= totalPages; i++) {
+      const d = document.createElement('span');
+      d.className = 'dot' + (i === 1 ? ' active' : '');
+      dotsContainer.appendChild(d);
+    }
+
+    function updateUI() {
+      document.querySelectorAll('.page').forEach((sec) => {
+        sec.classList.toggle('active', Number(sec.dataset.page) === currentPage);
+      });
+      document.querySelectorAll('.dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx + 1 === currentPage);
+      });
+      stepLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        updateUI();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        updateUI();
+      }
+    }
+
+    function goToPage(num) {
+      currentPage = Math.min(Math.max(num, 1), totalPages);
+      updateUI();
+    }
+
+    function blowCandles() {
+      const cake = document.getElementById('cake');
+      const status = document.getElementById('blowStatus');
+      cake.classList.toggle('blown');
+      if (cake.classList.contains('blown')) {
+        status.textContent = 'Candles blown out — wish sent into the universe.';
+      } else {
+        status.textContent = 'Candles relit — tap again whenever you want another wish.';
+      }
+    }
+
+    function answerQuiz(btn, message) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const fb = document.getElementById(`fb-${currentPage}`);
+      if (fb) fb.textContent = message;
+    }
+
+    const ambientLayer = document.getElementById('ambientLayer');
+    const heartSymbols = ['♡', '✦', '♡'];
+    for (let i = 0; i < 16; i++) {
+      const h = document.createElement('span');
+      h.className = 'floating-heart';
+      h.textContent = heartSymbols[i % heartSymbols.length];
+      h.style.left = `${(i * 6.5 + 3) % 96}%`;
+      h.style.fontSize = `${14 + (i % 4) * 5}px`;
+      h.style.animationDuration = `${11 + (i % 6) * 2.5}s`;
+      h.style.animationDelay = `${-(i * 1.7)}s`;
+      ambientLayer.appendChild(h);
+    }
+
+    function toggleMusic() {
+      const btn = document.getElementById('musicToggle');
+      if (!isPlaying) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx && AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+        let step = 0;
+        musicInterval = setInterval(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = notes[step % notes.length];
+          gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.85);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.9);
+          step += 1;
+        }, 950);
+        isPlaying = true;
+        btn.textContent = '♪ Music: On';
+      } else {
+        clearInterval(musicInterval);
+        musicInterval = null;
+        isPlaying = false;
+        btn.textContent = '♪ Music: Off';
+      }
+    }
+  </script>
+</body>
+</html>
